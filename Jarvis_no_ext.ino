@@ -2,15 +2,16 @@
 * Jarvis
 */
 //#define BLYNK_DEBUG
-#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
+//#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
 #define DHT11_PIN 4
 #define RELE_PIN 5
 #define EspSerial Serial1
-#define SSID "Your SSID"
-#define PASS "Your password"
+#define SSID "Indianet"
+#define PASS "pimapima"
 #define DST_IP "23.222.152.140" //api.wunderground.com
-#define LOCATIONID "Your location id" // location id like pws:ICASTIGL11, check on wunderground.com
+#define LOCATIONID "pws:ICASTIGL11" // location id
 
+//#include <avr/wdt.h>
 #include <ArduinoJson.h>
 #include <RTClib.h>
 #include <Wire.h>
@@ -40,8 +41,10 @@ NexButton boffter = NexButton(11, 2, "boffter");
 NexButton btermos = NexButton(0, 3, "btermos");
 NexButton bset = NexButton(0, 4, "bset");
 NexButton bbackter = NexButton(1, 1, "bback");
-NexButton bbacktem = NexButton(3, 4, "bback");
-NexButton bbackimp = NexButton(2, 1, "bback");
+NexButton bhomeimp1 = NexButton(3, 4, "bhome");
+NexButton bnextimp = NexButton(2, 9, "bnext");
+NexButton bprevimp = NexButton(3, 3, "bprev");
+NexButton bhomeimp = NexButton(2, 1, "bhome");
 NexNumber ntemp = NexNumber(0, 12, "ntemp");
 NexNumber ntempexth = NexNumber(0, 13, "ntempext");
 NexNumber nhumidh = NexNumber(0, 14, "numid");
@@ -74,8 +77,6 @@ NexNumber nt3min = NexNumber(4, 19, "nt3min");
 NexNumber nlastsynch = NexNumber(0, 29, "nlastsynch");//debug per vedere se aggiorna meteo correttamente, provvisoria
 NexText tdatah = NexText(0, 2, "tdayweek");
 NexText terror = NexText(10, 2, "terror");
-NexWaveform stemp = NexWaveform(3, 1, "stemp");
-NexWaveform shumid = NexWaveform(3, 2, "shumid");
 NexPicture pmeteohome = NexPicture(0, 11, "pmeteo");
 NexPicture p0meteo = NexPicture(4, 9, "p0meteo");
 NexPicture p1meteo = NexPicture(4, 10, "p1meteo");
@@ -92,7 +93,7 @@ WidgetRTC rtcblynk;
 
 BLYNK_ATTACH_WIDGET(rtcblynk, V10)//rtc remoto assegnato al pin virtuale 10
 
-char auth[] = "Your Auth ID";//use the auth ID from Blynk settings app
+char auth[] = "cad774f77e0f48d5a3419535664e5597";
 char daysOfTheWeek[7][12] = { "Domenica", "Lunedi'", "Martedi'", "Mercoledi'", "Giovedi'", "Venerdi'", "Sabato"};//lista giorni della settimana
 byte dayoftheweek = 0;//giorno della settimana attuale
 int temperature = 0;//temperatura
@@ -148,17 +149,19 @@ byte firstrun = 1;//necessaria in getnparseforecast per non disconnettere blynk 
 byte indx = 0;//indice per timeout reset esp8266
 byte firstsynchrtc = 1; //esegue la sincronizzazione con l'rtc remoto solo la prima volta e prima di aggiornare il meteo
 byte oralegale = 0; //tiene conto dell'ora legale/solare
+byte meteorun = 0; //segnala se getnparseforecast e' attivo
 
 NexTouch * nex_listen_list[] =//lista elementi display che inviano un comando da tenere conto
 {
   &bprgstat, &b1ora, &b2ore, &b3ore, &b4ore, &brecwifi,
   &brecgard, &bsaveter, &bsavegard, &bsavetime, &boffter,
-  &bsavetemp, &btermos, &bset, &bbacktem, &bbackter,
-  &bbackimp, &ntemp, &pmeteohome, &bbackmeteo,
+  &bsavetemp, &btermos, &bset, &bhomeimp1, &bprevimp, &bnextimp,
+  &bhomeimp, &ntemp, &pmeteohome, &bbackmeteo,
   NULL
 };
 
 void setup() {
+  //  wdt_disable();
   Serial.begin(115200);// imposta i baudrate
   EspSerial.begin(115200);
   Serial.println(F("setup"));//avisa che si e' in setup
@@ -189,22 +192,28 @@ void setup() {
   bsavetemp.attachPop(bsavetempPopCallback, &bsavetemp);
   btermos.attachPop(btermosPopCallback, &btermos);
   bset.attachPop(bsetPopCallback, &bset);
-  bbacktem.attachPop(bbacktemPopCallback, &bbacktem);
+  bhomeimp.attachPop(bhomeimpPopCallback, &bhomeimp);
+  bhomeimp1.attachPop(bhomeimp1PopCallback, &bhomeimp1);
+  bprevimp.attachPop(bprevimpPopCallback, &bprevimp);
+  bnextimp.attachPop(bnextimpPopCallback, &bnextimp);
   bbackter.attachPop(bbackterPopCallback, &bbackter);
-  bbackimp.attachPop(bbackimpPopCallback, &bbackimp);
   bbackmeteo.attachPop(bbackmeteoPopCallback, &bbackmeteo);
-  ntemp.attachPop(ntempPopCallback, &ntemp);
   bsavetemp.attachPop(bsavetempPopCallback, &bsavetemp);
   pmeteohome.attachPop(pmeteohomePopCallback, &pmeteohome);
   nexInit();
+  //  wdt_enable(WDTO_8S);
 }
 
 void loop() {
   Serial.println(F("loop"));
-  if (firstrun == 1)getnparseforecast(); //recupera le previsioni meteo se e' il primo avvio
-  Scheduler.scheduler(); // funzione di esecuzione dello scheduler(looper)
-  nexLoop(nex_listen_list);//controlla se qualche elemento dl display viene premuto e esegue le funzioni corrispondenti
-  if (blynkisconnected == 1) Blynk.run(); //blynk e' connesso, esegui il refresh di Blynk
+  //  wdt_reset();
+  if (firstrun == 1)meteorun = 1; //recupera le previsioni meteo se e' il primo avvio
+  if (meteorun == 1) getnparseforecast();
+  else {
+    Scheduler.scheduler(); // funzione di esecuzione dello scheduler(looper)
+    nexLoop(nex_listen_list);//controlla se qualche elemento dl display viene premuto e esegue le funzioni corrispondenti
+    if (blynkisconnected == 1) Blynk.run(); //blynk e' connesso, esegui il refresh di Blynk
+  }
 }
 
 BLYNK_CONNECTED() {//se blynk e' connesso
@@ -383,7 +392,11 @@ void bsetPopCallback(void *ptr)
 {
   nextpageid = 2;
 }
-void bbacktemPopCallback(void *ptr)
+void bhomeimp1PopCallback(void *ptr)
+{
+  nextpageid = 0;
+}
+void bhomeimpPopCallback(void *ptr)
 {
   nextpageid = 0;
 }
@@ -395,10 +408,6 @@ void bbackimpPopCallback(void *ptr)
 {
   nextpageid = 0;
 }
-void ntempPopCallback(void *ptr)
-{
-  nextpageid = 3;
-}
 void bbackmeteoPopCallback(void *ptr)
 {
   nextpageid = 0;
@@ -406,6 +415,14 @@ void bbackmeteoPopCallback(void *ptr)
 void pmeteohomePopCallback(void *ptr)
 {
   nextpageid = 4;
+}
+void bnextimpPopCallback(void *ptr)
+{
+  nextpageid = 3;
+}
+void bprevimpPopCallback(void *ptr)
+{
+  nextpageid = 2;
 }
 BLYNK_WRITE(V0)//se vengono scritti valori su pin virtuale 0
 {
@@ -415,6 +432,10 @@ BLYNK_WRITE(V0)//se vengono scritti valori su pin virtuale 0
     autostatus = 0;
     if (fast == 1) fast = 0;
   }
+}
+BLYNK_WRITE(V2)
+{
+  tempset = param.asInt();
 }
 void parseForecastJSON(char json[400])
 {

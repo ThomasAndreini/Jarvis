@@ -10,8 +10,9 @@ void acquisition() {
   if (ore == 2 || ore == 8 || ore == 14 || ore == 20) {
     if (minuti > 10) {//aggiorna ora e meteo dopo il decimo minuto per evitare che sincronizzando rtc remoto porti indietro l'ora e riesegua una seconda volta
       if (ore >= lastsynch + 1) {
-        if (blynkisconnected == 1) RTC.adjust(DateTime(year(), month(), day(), hour() + (oralegale + 1), minute(), second())); //sincronizza con l'rtc remoto prima di disconettersi
-        getnparseforecast(); //ogni 6 ore avvia aggiornamento meteo, se sono le ore 1,7,13,19 e se sono passate almeno 1 ora dall'ultima sincronizzaizone con successo
+        if (blynkisconnected == 1) RTC.adjust(DateTime(year(), month(), day(), hour() + (oralegale), minute(), second())); //sincronizza con l'rtc remoto prima di disconettersi
+        meteorun = 1; //ogni 6 ore avvia aggiornamento meteo, se sono le ore 2:11+,8:11+,14:11+,20:11+ e se sono passate almeno 1 ora dall'ultima sincronizzaizone con successo
+        return;
       }
     }
   }
@@ -20,7 +21,7 @@ void acquisition() {
     humidity = DHT.humidity;
   }
   if (firstsynchrtc == 1 && blynkisconnected == 1 && year() > 2015 && hour() < 22) { // se l'rtc remoto e' sincronizzato e e' il primo synch(e sono meno delle 22, altrimenti incasina data ora)
-    RTC.adjust(DateTime(year(), month(), day(), hour() + (oralegale + 1), minute(), second())); //sistema il fuso orario aggiungendo un ora e eventualmente l'ora legale
+    RTC.adjust(DateTime(year(), month(), day(), hour() + (oralegale), minute(), second())); //sistema il fuso orario aggiungendo un ora e eventualmente l'ora legale
     firstsynchrtc = 0; //azzera la variabile per evitare il loop
   }
   DateTime now = RTC.now();
@@ -30,7 +31,7 @@ void acquisition() {
   giorni = now.day();
   mesi = now.month();
   anni = now.year();
-  if (blynkisconnected == 1 && year() > 2015 && hour() < 21 && ore != hour() + (oralegale + 1))RTC.adjust(DateTime(year(), month(), day(), hour() + (oralegale + 1), minute(), second())); //se vede una differenza tra l'rtc remoto e l'rtc con fuso e eventuale ora legale aggiunti, sincronizza l'rtc
+  if (blynkisconnected == 1 && year() > 2015 && hour() < 22 && ore != hour() + (oralegale))RTC.adjust(DateTime(year(), month(), day(), hour() + (oralegale), minute(), second())); //se vede una differenza tra l'rtc remoto e l'rtc con fuso e eventuale ora legale aggiunti, sincronizza l'rtc
   Serial.print (F("ora "));
   Serial.println(ore);
   Serial.print (F("giorni "));
