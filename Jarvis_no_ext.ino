@@ -6,10 +6,10 @@
 #define DHT11_PIN 4
 #define RELE_PIN 5
 #define EspSerial Serial1
-#define SSID "Indianet"
-#define PASS "pimapima"
+#define SSID "" //insert your wifi SSID
+#define PASS "" //insert your wifi password
 #define DST_IP "23.222.152.140" //api.wunderground.com
-#define LOCATIONID "pws:ICASTIGL11" // location id
+#define LOCATIONID "" // location id find on wunderground.com example pws:ICASTIGL11
 
 //#include <avr/wdt.h>
 #include <ArduinoJson.h>
@@ -93,7 +93,7 @@ WidgetRTC rtcblynk;
 
 BLYNK_ATTACH_WIDGET(rtcblynk, V10)//rtc remoto assegnato al pin virtuale 10
 
-char auth[] = "cad774f77e0f48d5a3419535664e5597";
+char auth[] = ""; //Insert your auth string get from Blynk app
 char daysOfTheWeek[7][12] = { "Domenica", "Lunedi'", "Martedi'", "Mercoledi'", "Giovedi'", "Venerdi'", "Sabato"};//lista giorni della settimana
 byte dayoftheweek = 0;//giorno della settimana attuale
 int temperature = 0;//temperatura
