@@ -1,22 +1,24 @@
 /*
 * Jarvis
+* An IoT system made by Thomas Andreini
+* https://github.com/ThomasAndreini/Jarvis
 */
 //#define BLYNK_DEBUG
 //#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
 #define DHT11_PIN 4
 #define RELE_PIN 5
 #define EspSerial Serial1
-#define SSID "" //insert your wifi SSID
-#define PASS "" //insert your wifi password
-#define DST_IP "23.222.152.140" //api.wunderground.com
-#define LOCATIONID "" // location id find on wunderground.com example pws:ICASTIGL11
+#define ESP8266_BAUD 115200 //Baud Esp 8266
+#define SSID "" //Your wifi SSID
+#define PASS "" //Your wifi password
+#define DST_IP "23.222.152.140" //ip of api.wunderground.com
+#define LOCATIONID "" // location id get from wunderground.com
 
-//#include <avr/wdt.h>
+#include <ESP8266_Lib.h>
+#include <BlynkSimpleShieldEsp8266.h>
 #include <ArduinoJson.h>
 #include <RTClib.h>
 #include <Wire.h>
-#include <ESP8266_HardSer.h>
-#include <BlynkSimpleShieldEsp8266_HardSer.h>
 #include <Nextion.h>
 #include <looper.h>
 #include <dht11.h>
@@ -86,14 +88,14 @@ NexPicture p3meteo = NexPicture(4, 12, "p3meteo");
 looper Scheduler;
 dht11 DHT;
 RTC_DS1307 RTC;
-ESP8266 wifi(EspSerial);
+ESP8266 wifi(&EspSerial);
 WidgetLED ledterm(1);
 WidgetLED ledirr(7);
 WidgetRTC rtcblynk;
 
 BLYNK_ATTACH_WIDGET(rtcblynk, V10)//rtc remoto assegnato al pin virtuale 10
 
-char auth[] = ""; //Insert your auth string get from Blynk app
+char auth[] = ""; //Auth ID get from api developer registration on wunderground.com
 char daysOfTheWeek[7][12] = { "Domenica", "Lunedi'", "Martedi'", "Mercoledi'", "Giovedi'", "Venerdi'", "Sabato"};//lista giorni della settimana
 byte dayoftheweek = 0;//giorno della settimana attuale
 int temperature = 0;//temperatura
@@ -161,7 +163,6 @@ NexTouch * nex_listen_list[] =//lista elementi display che inviano un comando da
 };
 
 void setup() {
-  //  wdt_disable();
   Serial.begin(115200);// imposta i baudrate
   EspSerial.begin(115200);
   Serial.println(F("setup"));//avisa che si e' in setup
@@ -201,12 +202,10 @@ void setup() {
   bsavetemp.attachPop(bsavetempPopCallback, &bsavetemp);
   pmeteohome.attachPop(pmeteohomePopCallback, &pmeteohome);
   nexInit();
-  //  wdt_enable(WDTO_8S);
 }
 
 void loop() {
   Serial.println(F("loop"));
-  //  wdt_reset();
   if (firstrun == 1)meteorun = 1; //recupera le previsioni meteo se e' il primo avvio
   if (meteorun == 1) getnparseforecast();
   else {

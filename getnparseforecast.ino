@@ -8,16 +8,13 @@ void getnparseforecast() {
     Serial.begin(115200);//riconnetti le seriali, perche' Blynk.disconnect disconnette la serial e serial1
     EspSerial.begin(115200);
     delay(4000);//attendo che l'esp8266 sia pronto
-    //    wdt_reset();
   }
   if (firstrun == 1) firstrun = 0;//se e' il primo avvio azzera la variabile
   indx = 0;
   while (indx < 6) {//tenta il reset dell'esp per 5 volte
     delay(2000);
-    //      wdt_reset();
     Serial1.println(F("AT+RST")); // reset e controlla se l'ep8266 e' pronto
     delay(4000);
-    //      wdt_reset();
     if (Serial1.find("OK")) {//se il reset ha avuto successo
       //Serial.println(F("WiFi - Module is ready"));
       indx = 6;//imposta indx a 6 per uscire dal loop senza uscire dalla funzione
@@ -33,10 +30,8 @@ void getnparseforecast() {
     indx = 0;//inizializza la variabile
     while (indx < 6) {
       delay(2000);
-      //      wdt_reset();
       Serial1.println(F("AT+RST")); // reset e controlla se l'ep8266 e' pronto
       delay(4000);
-      //      wdt_reset();
       if (Serial1.find("OK")) {
         //Serial.println(F("WiFi - Module is ready"));
         indx = 5;//imposta indx a 5 per uscire dal loop
@@ -48,7 +43,6 @@ void getnparseforecast() {
     idbchk = 6;//attiva la riconnessione a blynk
     //Serial.println(F("timeout, esco"));
     lastsynch = ore;//se dopo 10 tentativi non riesce, imposta lastsynch e riprova alla prossima
-    //    wdt_reset();
     meteorun = 0;
     return;
   }
@@ -63,7 +57,6 @@ void getnparseforecast() {
   //Serial.println(cmd);
   Serial1.println(cmd);
   delay(4000);
-  //  wdt_reset();
   if (Serial1.find("ERROR")) {
     //Serial.println(F("Can not connect to the WiFi."));
     return;
@@ -78,7 +71,6 @@ void getnparseforecast() {
   Serial1.println(cmd);//imposta la connessione TCP
   //Serial.println(cmd);
   delay(500);
-  //  wdt_reset();
   if (Serial1.find("ERROR")) {
     //Serial.println(F("Errore connessione con server"));
     return;
@@ -105,11 +97,9 @@ void getnparseforecast() {
   unsigned int i = 0; //contatore timeout
   char json[buffer] = "{"; // array per il parsing Json
   int n = 1;          // contatore di caratteri del json
-  //  wdt_reset();
   //Serial.println(F("while in"));
   while (!Serial1.find("\"simpleforecast\": {")) {}//attende la stringa indicata per iniziare l'acquisizione
   //Serial.println(F("while out"));
-  //  wdt_reset();
   unsigned long timeoutforecast = millis();
   for (int j = 0; j < num_elements_fr; j++) {
     while (!Serial1.find(forecast[j])) {
@@ -156,7 +146,6 @@ void getnparseforecast() {
     }
     n++;
   }
-  //  wdt_reset();
   //Serial.print(F("inizio parse "));
   //Serial.println(json);
   parseForecastJSON(json);
@@ -169,10 +158,8 @@ void getnparseforecast() {
   indx = 0;
   while (indx < 6) {
     delay(2000);
-    //    wdt_reset();
     Serial1.println(F("AT+RST")); // reset e controlla se l'ep8266 e' pronto
     delay(3000);
-    //    wdt_reset();
     if (Serial1.find("OK")) {
       //Serial.println(F("WiFi - Module is ready"));
       indx = 6;//imposta indx a 6 per uscire dal loop
