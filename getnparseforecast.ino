@@ -104,7 +104,7 @@ void getnparseforecast() {
   for (int j = 0; j < num_elements_fr; j++) {
     while (!Serial1.find(forecast[j])) {
       if (timeoutforecast > millis()) timeoutforecast = millis();// se timeoutforecast e' maggiore di millis allora il contatore si e' riavviato, quindi aggiorna la variabile
-      if (timeoutforecast + 20000 < millis())return; // se sono passati piu' di 20 secondi esci
+      if (millis() - timeoutforecast > 20000)return; // se sono passati piu' di 20 secondi esci
     }
 
     String Str1 = forecast_rename[j];
