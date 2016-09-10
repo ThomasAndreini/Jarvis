@@ -2,6 +2,8 @@
 
 /ITALIANO/
 
+ATTENZIONE QUESTA VERSIONE NON VERRA' PIU' AGGIORNATA SI CONSIGLIA DI PASSARE A JARVIS NEXT
+
 Jarvis è un sistema IoT che include un unità  principale, un unità esterna e un server opzionale.
 L'unità principale è un termostato smart in grado di comunicare con il server e l'unità esterna, è in grado di scaricare le previsioni meteo dal sito wunderground.com  ed è controllabile tramite Blynk per Android e Ios.
 L'unità esterna avrà in dotazione un sensore di temperatura, uno di umidità e un elettrovalvola per controllare l'irrigazione del giardino.
@@ -49,6 +51,8 @@ Controllabile e monitorabile tramite app Blynk disponibile per Android e IOS (sc
 
 
 /ENGLISH/
+
+CAUTION THIS VERSION WILL NOT BE MORE UPDATE IS ADVISED TO MOVE TO JARVIS NEXT
 
 Jarvis is an IoT system that includes a main unit, an outdoor unit and an optional server.
 The main unit is a smart thermostat can communicate with the server and the external unit, it can download weather forecasts from wunderground.com site and is controllable via Blynk for Android and iOS.
