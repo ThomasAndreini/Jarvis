@@ -7,7 +7,9 @@ L'unità principale è un termostato smart in grado di comunicare con il server 
 L'unità esterna avrà in dotazione un sensore di temperatura, uno di umidità e un elettrovalvola per controllare l'irrigazione del giardino.
 
 Jarvis Next è stato creato perchè arduino diventa instabile durante la lunga e pesante operazione di download e comparazione del meteo, ora le operazioni di parsing meteo vengono effettuate dal server e vengono passate tramite virtual pin Blynk, in questo modo è stato possibile liberare anche spazio su arduino per aggiornamenti futuri.
+Cambiare gli auth token e la localita' di wunderground e di Blynk nel file getputforecast.py dove scritto "authtoken" "location" e "Blynkauthtoken".
 In questo progetto è presente anche un nuovo file, "getputforecast.py" deve essere inserito nella directory Blynk all'interno della directory home del server, questo è il file che si occupa di recuperare il meteo e trasmetterlo al server Blynk, per far si che venga eseguito ogni ora è necessario che venga inserita una stringa, basta digitare da terminale "crontab -e", andare in fondo al file, inserire la stringa "0 * * * * python /home/pi/Blynk/getputforecast.py" (escluse virgolette), salvare e uscire.
+
 
 Il progetto è così composto:
 
@@ -55,6 +57,7 @@ Jarvis Next is an IoT system that includes a main unit, an outdoor unit and a se
 The main unit is a smart thermostat can communicate with the server and the external unit, it can download weather forecasts from wunderground.com site and is controllable via Blynk for Android and iOS.
 The outdoor unit will have supplied a temperature sensor, a humidity and a solenoid valve to control irrigation of the garden.
 Jarvis Next was created because Arduino becomes unstable during long and heavy download operation and comparison of the weather, now the weather parsing operations are performed by the server, and are passed through virtual pin Blynk, in this way it was possible to free up space arduino for future upgrades.
+Change the auth token and location of wunderground and Blynk on file getputforecast.py where is write "authtoken" "location" and "Blynkauthtoken".
 This project is also a new file, "getputforecast.py" must be inserted in Blynk directory inside the home directory of the server, this is the file that is responsible to retrieve the weather and send it to Blynk server, to ensure to run every time it is necessary that a string is inserted, just type in terminal "crontab -e", go to the bottom of the file, enter the string "0 * * * * python /home/pi/Blynk/getputforecast.py" (quotation marks excluded), save and exit.
 
 
