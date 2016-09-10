@@ -9,8 +9,8 @@
 #define RELE_PIN 5
 #define EspSerial Serial1
 #define ESP8266_BAUD 115200
-#define SSID "Indianet" //Your Wi-Fi SSID
-#define PASS "pimapima" //Your Wi-Fi password
+#define SSID "ssid" //Your Wi-Fi SSID
+#define PASS "pwd" //Your Wi-Fi password
 
 #include <ESP8266_Lib.h>
 #include <BlynkSimpleShieldEsp8266.h>
@@ -92,7 +92,7 @@ WidgetRTC rtcblynk;
 
 BLYNK_ATTACH_WIDGET(rtcblynk, V10)//rtc remoto assegnato al pin virtuale 10
 
-char auth[] = "5c07e4b691864f0ea28041b81f47ab33"; //Auth ID Blynk
+char auth[] = "authid"; //Auth ID Blynk
 char daysOfTheWeek[7][12] = { "Domenica", "Lunedi'", "Martedi'", "Mercoledi'", "Giovedi'", "Venerdi'", "Sabato"};//lista giorni della settimana
 byte dayoftheweek = 0;//giorno della settimana attuale
 int temperature = 0;//temperatura
