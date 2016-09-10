@@ -1,7 +1,7 @@
 import requests
 from urllib2 import Request, urlopen
 
-r = requests.get("http://api.wunderground.com/api/4126cdff2c89e5af/forecast/q/pws:ICASTIGL11.json")
+r = requests.get("http://api.wunderground.com/api/authtoken/forecast/q/location")
 data = r.json()
 
 Tweek = ["", "", "", ""]
@@ -26,7 +26,7 @@ tosend = "[" + "\"" + str(Tweek[0]) +"\"" +  "," + "\"" + str(Tcond[0]) + "\"" +
 headers = {
   'Content-Type': 'application/json'
 }
-request = Request('http://127.0.0.1:8080/5c07e4b691864f0ea28041b81f47ab33/pin/V11', data=tosend, headers=headers)
+request = Request('http://127.0.0.1:8080/Blynkauthtoken/pin/V11', data=tosend, headers=headers)
 request.get_method = lambda: 'PUT'
 
 response_body = urlopen(request).read()
