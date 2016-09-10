@@ -1,10 +1,13 @@
-# Jarvis
+# Jarvis Next
 
 /ITALIANO/
 
-Jarvis è un sistema IoT che include un unità  principale, un unità esterna e un server opzionale.
+Jarvis Next è un sistema IoT che include un unità  principale, un unità esterna e un server.
 L'unità principale è un termostato smart in grado di comunicare con il server e l'unità esterna, è in grado di scaricare le previsioni meteo dal sito wunderground.com  ed è controllabile tramite Blynk per Android e Ios.
 L'unità esterna avrà in dotazione un sensore di temperatura, uno di umidità e un elettrovalvola per controllare l'irrigazione del giardino.
+
+Jarvis Next è stato creato perchè arduino diventa instabile durante la lunga e pesante operazione di download e comparazione del meteo, ora le operazioni di parsing meteo vengono effettuate dal server e vengono passate tramite virtual pin Blynk, in questo modo è stato possibile liberare anche spazio su arduino per aggiornamenti futuri.
+In questo progetto è presente anche un nuovo file, "getputforecast.py" deve essere inserito nella directory Blynk all'interno della directory home del server, questo è il file che si occupa di recuperare il meteo e trasmetterlo al server Blynk, per far si che venga eseguito ogni ora è necessario che venga inserita una stringa, basta digitare da terminale "crontab -e", andare in fondo al file, inserire la stringa "0 * * * * python /home/pi/Blynk/getputforecast.py" (escluse virgolette), salvare e uscire.
 
 Il progetto è così composto:
 
@@ -25,18 +28,16 @@ Unità esterna: (da fare)
 1x esp8266 esp 12E
 
 
-Server:(opzionale)*
+Server:
 
 1x Raspberry PI (il mio è il 2 rev B+, ma puoi usarne uno qualunque)
 1x Alimentatore 220v AC ---> 5v 2 ampere DC
 
 
-*Se non hai un Raspberry PI e non vuoi procurartelo è possibile usare i server cloud di Blynk, questo però diminuirà la sicurezza del sistema, in quanto Arduino e Esp8266 comunicano in chiaro con il server.
-
 Caratteristiche unità principale :
 Calendario completo di gestione dell'ora solare / legale
 Sincronizzazione data / ora automatica tramite internet o impostazione manuale.
-Download previsioni meteo per 4 giorni
+Download previsioni meteo per 4 giorni (tramite server)
 Restituzione previsioni temperature massime e minime e vento primo giorno
 Icone meteo cambiano secondo giorno / notte
 Impostazione timer attivazione / spegnimento
@@ -50,9 +51,13 @@ Controllabile e monitorabile tramite app Blynk disponibile per Android e IOS (sc
 
 /ENGLISH/
 
-Jarvis is an IoT system that includes a main unit, an outdoor unit and an optional server.
+Jarvis Next is an IoT system that includes a main unit, an outdoor unit and a server.
 The main unit is a smart thermostat can communicate with the server and the external unit, it can download weather forecasts from wunderground.com site and is controllable via Blynk for Android and iOS.
 The outdoor unit will have supplied a temperature sensor, a humidity and a solenoid valve to control irrigation of the garden.
+Jarvis Next was created because Arduino becomes unstable during long and heavy download operation and comparison of the weather, now the weather parsing operations are performed by the server, and are passed through virtual pin Blynk, in this way it was possible to free up space arduino for future upgrades.
+This project is also a new file, "getputforecast.py" must be inserted in Blynk directory inside the home directory of the server, this is the file that is responsible to retrieve the weather and send it to Blynk server, to ensure to run every time it is necessary that a string is inserted, just type in terminal "crontab -e", go to the bottom of the file, enter the string "0 * * * * python /home/pi/Blynk/getputforecast.py" (quotation marks excluded), save and exit.
+
+
 
 The project consists of:
 
@@ -73,18 +78,16 @@ Outdoor unit: (to do)
 1x esp8266 esp 12E
 
 
-Server: (Optional) *
+Server:
 
 1x Raspberry PI (mine is 2 Rev. B +, but you can use one any)
 1x 220v AC power supply ---> 5v 2 amperes DC
 
 
-* If you have a Raspberry PI and do not want buy it you can use the Blynk cloud server, but this will decrease the security of the system, as Arduino and Esp8266 communicate clearly with the server.
-
 Main Unit Features:
 Calendar Full Time / Daylight Management
 Synchronizing date / time automatically via the internet or manual setting.
-Download weather forecast for 4 days
+Download weather forecast for 4 days (by server)
 Returning maximum and minimum temperatures and wind forecast first day
 weather icons change according to the day / night
 Setting timer on / off
