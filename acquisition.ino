@@ -2,20 +2,8 @@ void acquisition() {
   Serial.println(F("acquisition"));
   Serial.print(F("ore "));
   Serial.println(ore);
-  Serial.print(F("lstsynch "));
-  Serial.println(lastsynch);
   Serial.print(F("blynkisconn "));
   Serial.println(blynkisconnected);
-  if (ore == 0)lastsynch = 0;//azzera lastsynch per evitare che dopo mezzanotte l'if sotto non funzioni
-  if (ore == 2 || ore == 8 || ore == 14 || ore == 20) {
-    if (minuti > 10) {//aggiorna ora e meteo dopo il decimo minuto per evitare che sincronizzando rtc remoto porti indietro l'ora e riesegua una seconda volta
-      if (ore >= lastsynch + 1) {
-        if (blynkisconnected == 1) RTC.adjust(DateTime(year(), month(), day(), hour() + (oralegale), minute(), second())); //sincronizza con l'rtc remoto prima di disconettersi
-        meteorun = 1; //ogni 6 ore avvia aggiornamento meteo, se sono le ore 2:11+,8:11+,14:11+,20:11+ e se sono passate almeno 1 ora dall'ultima sincronizzaizone con successo
-        return;
-      }
-    }
-  }
   if ( DHT.read(DHT11_PIN) == DHTLIB_OK) { //se dht e' disponibile
     temperature = DHT.temperature;
     humidity = DHT.humidity;

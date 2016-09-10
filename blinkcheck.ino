@@ -3,7 +3,7 @@ void blinkcheck() {
   if (blynkisconnected == 0) idbchk = idbchk + 1; //if Blink is disconnected add 1 to idbchk
   else idbchk = 0;
   if (idbchk > 5) { // if idbchk is equal to 6 so 60 seconds
-    Blynk.begin(auth, wifi, SSID, PASS);
+    Blynk.begin(auth, wifi, SSID, PASS, "192.168.0.200");
     delay(4000);
     Blynk.connect();//try to connect
     idacq = 0;//set to 0 the acquisition id for give time to connect

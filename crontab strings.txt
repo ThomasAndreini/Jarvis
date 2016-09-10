@@ -1,0 +1,2 @@
+@reboot java -jar /home/pi/server-0.17.0.jar -dataFolder /home/pi/Blynk &
+0 * * * * python /home/pi/Blynk/getputforecast.py
