@@ -9,7 +9,7 @@
 #define RELE_PIN 5
 #define EspSerial Serial1
 #define ESP8266_BAUD 115200
-#define SSID "ssid" //Your Wi-Fi SSID
+#define SSID "SSID" //Your Wi-Fi SSID
 #define PASS "pwd" //Your Wi-Fi password
 
 #include <ESP8266_Lib.h>
@@ -21,6 +21,8 @@
 #include <dht11.h>
 #include <TimeLib.h>
 #include <WidgetRTC.h>
+#include <EEPROM.h>
+#include <avr/wdt.h>
 
 NexPage presultok    = NexPage(9, 0, "resultokpage");//dichiarazione elementi del display nextion
 NexPage presultko    = NexPage(10, 0, "resultkopage");
@@ -92,7 +94,7 @@ WidgetRTC rtcblynk;
 
 BLYNK_ATTACH_WIDGET(rtcblynk, V10)//rtc remoto assegnato al pin virtuale 10
 
-char auth[] = "authid"; //Auth ID Blynk
+char auth[] = "5c07e4b691864f0ea280xxxxxxxxxxxx"; //Auth ID Blynk
 char daysOfTheWeek[7][12] = { "Domenica", "Lunedi'", "Martedi'", "Mercoledi'", "Giovedi'", "Venerdi'", "Sabato"};//lista giorni della settimana
 byte dayoftheweek = 0;//giorno della settimana attuale
 int temperature = 0;//temperatura
@@ -136,7 +138,6 @@ byte meteo1 = 0;
 byte meteo2 = 0;
 byte meteo3 = 0;
 byte firstsynchrtc = 1; //esegue la sincronizzazione con l'rtc remoto solo la prima volta
-byte oralegale = 0; //tiene conto dell'ora legale/solare
 byte offset = 0; //permette il caricamento dei dati su Blink ogni minuto
 byte offset1 = 0;
 NexTouch * nex_listen_list[] =//lista elementi display che inviano un comando da tenere conto
@@ -149,6 +150,17 @@ NexTouch * nex_listen_list[] =//lista elementi display che inviano un comando da
 };
 
 void setup() {
+  starthour = EEPROM.read(0); //ripristina i valori impostati se riavviato
+  startmin = EEPROM.read(1); //ripristina i valori impostati se riavviato
+  endhour = EEPROM.read(2); //ripristina i valori impostati se riavviato
+  endmin = EEPROM.read(3); //ripristina i valori impostati se riavviato
+  tempset = EEPROM.read(4); //ripristina i valori impostati se riavviato
+  autostatus = EEPROM.read(5); //ripristina i valori impostati se riavviato
+  laststarthour = EEPROM.read(6); //ripristina i valori impostati se riavviato
+  laststartmin = EEPROM.read(7); //ripristina i valori impostati se riavviato
+  lastendhour = EEPROM.read(8); //ripristina i valori impostati se riavviato
+  lastendmin = EEPROM.read(9); //ripristina i valori impostati se riavviato
+  lastautostatus = EEPROM.read(10); //ripristina i valori impostati se riavviato
   Serial.begin(115200);// imposta i baudrate
   EspSerial.begin(115200);
   Serial.println(F("setup"));//avisa che si e' in setup
@@ -188,13 +200,16 @@ void setup() {
   bsavetemp.attachPop(bsavetempPopCallback, &bsavetemp);
   pmeteohome.attachPop(pmeteohomePopCallback, &pmeteohome);
   nexInit();
+  wdt_enable(WDTO_8S);
 }
 
 void loop() {
+  wdt_reset();
   Serial.println(F("loop"));
   Scheduler.scheduler(); // funzione di esecuzione dello scheduler(looper)
   nexLoop(nex_listen_list);//controlla se qualche elemento dl display viene premuto e esegue le funzioni corrispondenti
   if (blynkisconnected == 1) Blynk.run(); //blynk e' connesso, esegui il refresh di Blynk
+  wdt_reset();
 }
 
 BLYNK_CONNECTED() {//se blynk e' connesso
@@ -235,6 +250,16 @@ void b1oraPopCallback(void *ptr)
   fast = 1;
   lastautostatus = autostatus;
   autostatus = 1;
+  EEPROM.write(0, starthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(1, startmin);
+  EEPROM.write(2, endhour);
+  EEPROM.write(3, endmin);
+  EEPROM.write(5, autostatus);
+  EEPROM.write(6, laststarthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(7, laststartmin);
+  EEPROM.write(8, lastendhour);
+  EEPROM.write(9, lastendmin);
+  EEPROM.write(10, lastautostatus);
   presultok.show();
   nextpageid = 0;
 }
@@ -252,6 +277,16 @@ void b2orePopCallback(void *ptr)
   fast = 1;
   lastautostatus = autostatus;
   autostatus = 1;
+  EEPROM.write(0, starthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(1, startmin);
+  EEPROM.write(2, endhour);
+  EEPROM.write(3, endmin);
+  EEPROM.write(5, autostatus);
+  EEPROM.write(6, laststarthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(7, laststartmin);
+  EEPROM.write(8, lastendhour);
+  EEPROM.write(9, lastendmin);
+  EEPROM.write(10, lastautostatus);
   presultok.show();
   nextpageid = 0;
 }
@@ -269,6 +304,16 @@ void b3orePopCallback(void *ptr)
   fast = 1;
   lastautostatus = autostatus;
   autostatus = 1;
+  EEPROM.write(0, starthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(1, startmin);
+  EEPROM.write(2, endhour);
+  EEPROM.write(3, endmin);
+  EEPROM.write(5, autostatus);
+  EEPROM.write(6, laststarthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(7, laststartmin);
+  EEPROM.write(8, lastendhour);
+  EEPROM.write(9, lastendmin);
+  EEPROM.write(10, lastautostatus);
   presultok.show();
   nextpageid = 0;
 }
@@ -286,6 +331,16 @@ void b4orePopCallback(void *ptr)
   fast = 1;
   lastautostatus = autostatus;
   autostatus = 1;
+  EEPROM.write(0, starthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(1, startmin);
+  EEPROM.write(2, endhour);
+  EEPROM.write(3, endmin);
+  EEPROM.write(5, autostatus);
+  EEPROM.write(6, laststarthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(7, laststartmin);
+  EEPROM.write(8, lastendhour);
+  EEPROM.write(9, lastendmin);
+  EEPROM.write(10, lastautostatus);
   presultok.show();
   nextpageid = 0;
 }
@@ -312,6 +367,11 @@ void bsaveterPopCallback(void *ptr)
   endhour = byte(shet);
   endmin = byte(smet);
   autostatus = 1;
+  EEPROM.write(0, starthour); //salva su eeeprom per ripristinarli in caso di riavvio
+  EEPROM.write(1, startmin);
+  EEPROM.write(2, endhour);
+  EEPROM.write(3, endmin);
+  EEPROM.write(5, autostatus);
   presultok.show();
   nextpageid = 0;
 }
@@ -340,6 +400,7 @@ void bsavetempPopCallback(void *ptr)
   uint32_t temp;
   ntempset.getValue(&temp);
   tempset = byte(temp);
+  EEPROM.write(4, tempset); //salva su eeeprom per ripristinarli in caso di riavvio
   presultok.show();
   nextpageid = 0;
 }
@@ -418,6 +479,8 @@ BLYNK_WRITE(V0)//se vengono scritti valori su pin virtuale 0
 BLYNK_WRITE(V2)
 {
   tempset = param.asInt();
+  EEPROM.write(4, tempset);
+
 }
 BLYNK_WRITE(V11)//se vengono scritti valori su pin virtuale 11 ovvero il pin del meteo dal rapberry
 {

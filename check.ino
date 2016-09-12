@@ -12,6 +12,11 @@ void check(void) {
           endhour = lastendhour;
           fast = 0;
           autostatus = lastautostatus;
+          EEPROM.write(0, starthour); //salva su eeeprom per ripristinarli in caso di riavvio
+          EEPROM.write(1, startmin);
+          EEPROM.write(2, endhour);
+          EEPROM.write(3, endmin);
+          EEPROM.write(5, autostatus);
         }
       }
     }
@@ -25,6 +30,11 @@ void check(void) {
           endhour = lastendhour;
           fast = 0;
           autostatus = lastautostatus;
+          EEPROM.write(0, starthour); //salva su eeeprom per ripristinarli in caso di riavvio
+          EEPROM.write(1, startmin);
+          EEPROM.write(2, endhour);
+          EEPROM.write(3, endmin);
+          EEPROM.write(5, autostatus);
         }
       }
       else manualstatus = 1; //altrimenti lo attiva
