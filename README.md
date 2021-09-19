@@ -1,5 +1,7 @@
 # Jarvis Next
 
+**This project is not maintained, you can fork this**
+
 /ITALIANO/
 
 Jarvis Next è un sistema IoT che include un unità  principale, un unità esterna e un server.
